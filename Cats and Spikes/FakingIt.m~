@@ -1,0 +1,25 @@
+
+len=10000;
+res=0.001;
+nTrials=7;
+synchloc=6000;
+
+
+f1=FiltFT(500*randn(len,1),.5,1/res); f1=f1-min(f1);
+f2=FiltFT(500*randn(len,1),.5,1/res); f2=f2-min(f2);
+
+d=zeros(len,1); d(synchloc)=1;
+f12=FiltFT(500*randn(len,1),.5,1/res); f12=f12-min(f12);
+
+S=SpikeBanhoff;
+S.sType='gauss'; S.sWidth=0.05;
+S.T=cell(2,nTrials);
+for i=1:nTrials
+    P1=PechePourPoisson(f1,res);
+    P2=PechePourPoisson(f2,res);
+    P12=PechePourPoisson(f12,res);
+
+    S.T{1,i}=sort([P1; P12]);
+    S.T{2,i}=sort([P2; P12]);
+end
+    

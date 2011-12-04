@@ -1,0 +1,413 @@
+function varargout = exploadGUI4(varargin)
+%EXPLOADGUI4 M-file for exploadGUI4.fig
+%      EXPLOADGUI4, by itself, creates a new EXPLOADGUI4 or raises the existing
+%      singleton*.
+%
+%      H = EXPLOADGUI4 returns the handle to a new EXPLOADGUI4 or the handle to
+%      the existing singleton*.
+%
+%      EXPLOADGUI4('Property','Value',...) creates a new EXPLOADGUI4 using the
+%      given property value pairs. Unrecognized properties are passed via
+%      varargin to exploadGUI4_OpeningFcn.  This calling syntax produces a
+%      warning when there is an existing singleton*.
+%
+%      EXPLOADGUI4('CALLBACK') and EXPLOADGUI4('CALLBACK',hObject,...) call the
+%      local function named CALLBACK in EXPLOADGUI4.M with the given input
+%      arguments.
+%
+%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
+%      instance to run (singleton)".
+%
+% See also: GUIDE, GUIDATA, GUIHANDLES
+
+% Edit the above text to modify the response to help exploadGUI4
+
+% Last Modified by GUIDE v2.5 29-Jan-2011 17:05:05
+
+% Begin initialization code - DO NOT EDIT
+gui_Singleton = 1;
+gui_State = struct('gui_Name',       mfilename, ...
+                   'gui_Singleton',  gui_Singleton, ...
+                   'gui_OpeningFcn', @exploadGUI4_OpeningFcn, ...
+                   'gui_OutputFcn',  @exploadGUI4_OutputFcn, ...
+                   'gui_LayoutFcn',  [], ...
+                   'gui_Callback',   []);
+if nargin && ischar(varargin{1})
+   gui_State.gui_Callback = str2func(varargin{1});
+end
+
+if nargout
+    [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+else
+    gui_mainfcn(gui_State, varargin{:});
+end
+% End initialization code - DO NOT EDIT
+
+end
+
+% --- Executes just before exploadGUI4 is made visible.
+function exploadGUI4_OpeningFcn(hObject, eventdata, handles, varargin)
+% This function has no output args, see OutputFcn.
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% varargin   unrecognized PropertyName/PropertyValue pairs from the
+%            command line (see VARARGIN)
+
+% Choose default command line output for exploadGUI4
+handles.output = hObject;
+
+% Update handles structure
+guidata(hObject, handles);
+
+% UIWAIT makes exploadGUI4 wait for user response (see UIRESUME)
+% uiwait(handles.figure1);
+end
+
+% --- Outputs from this function are returned to the command line.
+function varargout = exploadGUI4_OutputFcn(hObject, eventdata, handles)
+% varargout  cell array for returning output args (see VARARGOUT);
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get default command line output from handles structure
+varargout{1} = handles.output;
+
+
+
+end
+
+function editSpike_Callback(hObject, eventdata, handles)
+% hObject    handle to editSpike (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editSpike as text
+%        str2double(get(hObject,'String')) returns contents of editSpike as a double
+
+
+% --- Executes during object creation, after setting all properties.
+end
+
+function editSpike_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editSpike (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+end
+
+function editData_Callback(hObject, eventdata, handles)
+% hObject    handle to editData (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editData as text
+%        str2double(get(hObject,'String')) returns contents of editData as a double
+
+
+% --- Executes during object creation, after setting all properties.
+end
+
+function editData_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editData (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushSpikeFind.
+end
+
+function pushSpikeFind_Callback(hObject, eventdata, handles)
+% hObject    handle to pushSpikeFind (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushDataFind.
+end
+
+function pushDataFind_Callback(hObject, eventdata, handles)
+% hObject    handle to pushDataFind (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+end
+
+function editCat_Callback(hObject, eventdata, handles)
+% hObject    handle to editCat (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editCat as text
+%        str2double(get(hObject,'String')) returns contents of editCat as a double
+
+
+% --- Executes during object creation, after setting all properties.
+end
+
+function editCat_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editCat (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushGO.
+end
+
+function pushGO_Callback(hObject, eventdata, handles)
+% hObject    handle to pushGO (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+end
+
+function editRoot_Callback(hObject, eventdata, handles)
+% hObject    handle to editRoot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editRoot as text
+%        str2double(get(hObject,'String')) returns contents of editRoot as a double
+
+
+% --- Executes during object creation, after setting all properties.
+end
+
+function editRoot_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editRoot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushRoot.
+end
+
+function pushRoot_Callback(hObject, eventdata, handles)
+% hObject    handle to pushRoot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushSearch.
+end
+
+function pushSearch_Callback(hObject, eventdata, handles)
+% hObject    handle to pushSearch (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+end
+
+function editEEG_Callback(hObject, eventdata, handles)
+% hObject    handle to editEEG (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editEEG as text
+%        str2double(get(hObject,'String')) returns contents of editEEG as a double
+
+
+% --- Executes during object creation, after setting all properties.
+end
+
+function editEEG_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editEEG (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushEEGFind.
+end
+
+function pushEEGFind_Callback(hObject, eventdata, handles)
+% hObject    handle to pushEEGFind (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+end
+
+function editStim_Callback(hObject, eventdata, handles)
+% hObject    handle to editStim (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editStim as text
+%        str2double(get(hObject,'String')) returns contents of editStim as a double
+
+
+% --- Executes during object creation, after setting all properties.
+end
+
+function editStim_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editStim (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushStimFind.
+end
+
+function pushStimFind_Callback(hObject, eventdata, handles)
+% hObject    handle to pushStimFind (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+end
+
+function editStage_Callback(hObject, eventdata, handles)
+% hObject    handle to editStage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editStage as text
+%        str2double(get(hObject,'String')) returns contents of editStage as a double
+
+
+% --- Executes during object creation, after setting all properties.
+end
+
+function editStage_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editStage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+end
+
+function editType_Callback(hObject, eventdata, handles)
+% hObject    handle to editType (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editType as text
+%        str2double(get(hObject,'String')) returns contents of editType as a double
+
+
+% --- Executes during object creation, after setting all properties.
+end
+
+function editType_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editType (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in listSearch.
+end; function listSearch_Callback(hObject, eventdata, handles)
+% hObject    handle to listSearch (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns listSearch contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from listSearch
+
+
+% --- Executes during object creation, after setting all properties.
+end; function listSearch_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to listSearch (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushSpikeAdd.
+end; function pushSpikeAdd_Callback(hObject, eventdata, handles)
+% hObject    handle to pushSpikeAdd (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushDataAdd.
+end; function pushDataAdd_Callback(hObject, eventdata, handles)
+% hObject    handle to pushDataAdd (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushEEGAdd.
+end; function pushEEGAdd_Callback(hObject, eventdata, handles)
+% hObject    handle to pushEEGAdd (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushStimAdd.
+end; function pushStimAdd_Callback(hObject, eventdata, handles)
+% hObject    handle to pushStimAdd (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushFilter.
+end; function pushFilter_Callback(hObject, eventdata, handles)
+% hObject    handle to pushFilter (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
