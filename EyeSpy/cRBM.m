@@ -2,6 +2,16 @@ classdef cRBM < handle
     
 	properties
         
+        % Network initialization structure
+        I=struct('mapsize',{[] []},'mapcount',{1 4},'cnx',{[] []},'fsize',{[] 5},'type',{'in' 'conv'});
+        % Indexed by layer number
+        % Any arguments left empty will be defaulted if possible
+        % mapsize: size of each map (def: mapsize(i-1)-floor(fsize(i)/2)
+        % mapcount: number of maps in layer
+        % cnx: connection matrix between maps in this-last layer (nThis x nLast) 
+        % fsize: filter size (filters assumed to be square).
+        % type: 'in','conv','max'.  Indicates what operation the layer performs.
+        
         imdim;      % Dimensions of image, if using image block as input        
         
         % Parameters
@@ -13,7 +23,7 @@ classdef cRBM < handle
         
         outlabels;  % Maps outputs onto output labels
         
-        L=struct(cnx,{[]},'M', {struct('P',{},'S',{},'G',{},'W',{}) ,'B',{},'type',{}});  % Layer Structure
+        L=struct('cnx',{[]},'M', {struct('P',{},'S',{},'G',{},'W',{}) ,'B',{},'type',{}});  % Layer Structure
 
         % Stochastic transfer function
         f=@(x)round(rand(size(x))+logsig(x)-.5);
@@ -28,11 +38,11 @@ classdef cRBM < handle
     
     methods % Keepers
         
-        function init(A,insize,cnx,fsize,type)
+        function init(A,I)
             % cnx : a cell array of boolean connection matrices.
             %       or of single numbers, indicating the number of
             %       connections to the next layer (full connectivity is
-            %       then assumed)
+            %       assumed if empty)
             % fsize:Array containing filter sizes of each map.  For now,
             %       filters are assumed to be square.
             % type: Cell array contining layer types.  Must be:
@@ -41,18 +51,30 @@ classdef cRBM < handle
             % Note that this function will insert an 'input' layer before
             % this one.
             
-            if ~isscalar(insize)
-                error('Insize must be scaler.  Yes that means we only support square images for now.  Deal with it.');
-            end
+            if ~exist('I','var'), I=A.I; end
             
-            A.L(1).W{1}=A.winit*randn(insize);
-            for i=2:length(cnx)
-                fp
-                for j=1:length(A.L(i).M)
-                A.L(i).W{i}
+            
+            
+            A.L=struct('cnx',{[]},'M', {struct('P',{},'S',{},'G',{},'W',{})} ,'B',{},'type',{});  % Layer Structure
+            A.L(1).M(1).B{1}=zeros(I(1).mapsize);
+            A.L(1).type='in';
+            
+            for i=2:length(I)               
+                if isempty(I(i).cnx),I(i).cnx=true(I(i).mapcount,I(i-1).mapcount); end
+                A.L(i).cnx=I(i).cnx;
+                
+                if isempty(I(i).fsize),I(i).fsize=I(i-1).mapsize-floor(I(i).fsize/2); end
+                                
+                for j=1:I(i).mapcount
+                    A.L(i).M(j).B=zeros(I(i).fsize);
+                    A.L(i).M(j).W=cell(1,I(i-1).mapcount);
+                    for k=1:find(I(i).cnx(j,:))
+                        A.L(i).M(j).W{k}=randn(I(i).fsize)*A.winit;
+                    end
                 end
             end
             
+            A.I=I;
 %             A.L(1).init([],insize,'in')
 %             for i=2:length(cnx)
 %                 A.L(i).init(cnx{i-1},fsize(i-1),type(i-1));
@@ -98,7 +120,6 @@ classdef cRBM < handle
             
         end
         
-        
         function pairRun(A,in,dp)
             % Run the unsupervised training algorithm on a pair of layers.
             
@@ -121,8 +142,7 @@ classdef cRBM < handle
             
             
         end
-        
-                
+             
         function out=wakePass(A,in,type)
             if nargin<3 || strcmpi(type,'stochastic')
                 tf=A.f;

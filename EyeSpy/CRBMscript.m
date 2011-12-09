@@ -1,4 +1,4 @@
-close all hidden; clear classes; clc;
+% close all hidden; clear classes; clc;
 
 %% Obtain image set.
 
@@ -20,7 +20,17 @@ A=cRBM;
 A.winit=.001;
 A.eta=2;
 
-A.init(size(S.IM,1),[],7,'conv');
+
+I=struct(...
+    'mapsize'   ,{  S.imsize    []      },...
+    'mapcount'  ,{  1           4       },...
+    'cnx'       ,{  []          []      },...
+    'fsize'     ,{  []          5       },...
+    'type'      ,{  'in'        'conv'  }...
+);
+        
+
+A.init(I);
 
 
 %% 

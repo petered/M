@@ -21,6 +21,8 @@ function matrix=lowlevelreading(location, desired, show)
 % poconn4.at.gmail
 
 
+
+
 % if ~exist('image','var'), image=false;  end
 if ~exist('show','var'), show=false;  end
 if ~exist('desired','var')||isempty(desired), desired=inf;  end
@@ -29,6 +31,8 @@ if ~exist('location','var') || isempty(location)
     [f p]=uigetfile('*','Select MNIST file');
     cd(p);
     location=[p filesep f];
+else
+    assert(exist(location,'file')>0,sprintf('File: "%s" not found.',location));
 end
 
 %% Get Info About Data

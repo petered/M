@@ -12,6 +12,7 @@ classdef FFnetClass <handle
         
         batch=100;  % SIze of batches used for training
         
+%         stopcrit;   % Stop criterion for batch training (leave empty
     end
   
     
@@ -73,12 +74,14 @@ classdef FFnetClass <handle
             for i=1:length(A.L)
                 A.L(i).rate=rate;
             end
+            N.rate=rate;
         end
         
         function set.decay(A,decay)
             for i=1:length(A.L)
                 A.L(i).decay=decay;
             end
+            N.decay=decay;
         end
         
         function [grade err]=testnet(A,input, tar)
@@ -106,7 +109,11 @@ classdef FFnetClass <handle
             
         end
                 
-        function batchTrain(A,in,teacher,epochs)
+        function batchTrain(A,in,teacher,epochs,stopcrit)
+            
+            if ~exist('stopcrit','var'), stopit=false;
+            else stopit=true; 
+            end
             
             if size(teacher,2)~=size(in,2);
                 error('The number of samples in the training set, %g, does not match the number of labels, %g.',size(in,2),size(teacher,2));
@@ -120,17 +127,25 @@ classdef FFnetClass <handle
             
             nbatch=ceil(size(in,2)/A.batch);
             fprintf('Training network (supervised): %g epochs of %g batches\n',epochs,nbatch);
-                        
+                       
+            success=nan(1,nbatch);
             for ep=1:epochs
                 fprintf('  Epoch %g:  ',ep);
                 k=1;
                 for ba=1:nbatch-1
-                    success=A.trainround(in(:,k:k+A.batch-1),teacher(:,k:k+A.batch-1));  
-                    fprintf('%g:%g%%..',ba,success*100);
+                    success(ba)=A.trainround(in(:,k:k+A.batch-1),teacher(:,k:k+A.batch-1));  
+                    fprintf('%g:%g%%..',ba,success(ba)*100);
                     k=k+A.batch;
                 end
                 fprintf('%g..',nbatch);
-                A.trainround(in(:,k:end),teacher(:,k:end));     
+                success(end)=A.trainround(in(:,k:end),teacher(:,k:end));     
+                if stopit
+                    if mean(success)>stopcrit
+                        disp('Stopping criterion reached');
+                        return;
+                    end
+                end
+                
                 disp Done                
             end
             
