@@ -1,4 +1,4 @@
-classdef House < handle
+classdef House < DataBaseItem
     
     properties
         
@@ -33,6 +33,20 @@ classdef House < handle
             price=A.worth*A.W.houseIndex; % TODO: this is too simple, need to factor in selling desperation
             
         end
+        
+    end
+    
+    methods (Static)
+        
+        function H=build(worths)
+                        
+            S=struct('worth',{worths});
+
+            H_=House;
+            H=H_.init(S,length(worths));
+                           
+        end
+        
         
     end
     

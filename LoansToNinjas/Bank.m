@@ -1,4 +1,4 @@
-classdef Bank < handle
+classdef Bank < DataBaseItem
     
     properties
         

@@ -1,4 +1,4 @@
-classdef HomeOwner < handle
+classdef HomeOwner < DataBaseItem
     
     properties
         
@@ -242,9 +242,7 @@ classdef HomeOwner < handle
         
         
     end
-    
-    
-    
+        
     
     
     

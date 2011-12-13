@@ -1,4 +1,4 @@
-classdef Mortgage < handle
+classdef Mortgage < DataBaseItem
 % This class serves both to define a mortgage, and a class of mortgages.  
     
     properties

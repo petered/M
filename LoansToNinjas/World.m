@@ -1,4 +1,4 @@
-classdef World < handle
+classdef World < DataBaseItem
     
     properties
         
@@ -25,6 +25,11 @@ classdef World < handle
         
         pJobLoss;   % Probability of losing a job
         pJobGain;   % Probability of getting a job    
+        
+        
+        % Initialization properties
+        
+        
         
     end
     

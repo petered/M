@@ -1,4 +1,4 @@
-classdef MortgageType < handle
+classdef MortgageType < DataBaseItem
     
     properties
         
@@ -25,7 +25,7 @@ classdef MortgageType < handle
         
         function granted=evaluate(A,H,O)
             
-            granted=O.cash>down*H.price;
+            granted=O.cash>A.down*H.price;
             
             
         end
