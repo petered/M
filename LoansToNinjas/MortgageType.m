@@ -7,8 +7,7 @@ classdef MortgageType < DataBaseItem
                         % true: Adjustable interest rate: tied to fed
                         % false: Fixed interest rate.  Decided on at start
         
-        rate;           % if adjustable=true : monthly interest rate 
-                        % if adjustable=false: additional interest rate (to federal) 
+        ratePremium;    % Addition to standard interest rate
         
         teaser;         % Special interest rate (just for adjustables) 
                         % offered in initial years of mortgage.  
@@ -17,8 +16,9 @@ classdef MortgageType < DataBaseItem
         
         down;           % Fraction of house cost required as downpayment
         
-        incomeBuffer;   % Buffer defining minimum income
+        incomeBuffer;   % Buffer defining minimum income relative to downpayment.
         
+        W;
     end
     
     methods
@@ -33,25 +33,31 @@ classdef MortgageType < DataBaseItem
         
         function M=realize(A,H,time)
             % Initialize a real Mortgage from a mortgage type
-                        
-            if A.adjustable
-                [schP schC]=A.makeAdjustableSchedule(time,A.teaser,A.rate+A.W.fedRate,principal);
-            else
-                [schP schC]=A.makeFixedSchedule(time,A.teaser,A.rate+A.W.fedRate,principal);
-            end
+                                    
             
             M=Mortgage;
-            M.principal=principal;      % House cost minus downpayment
+            M.downPayment=H.price*A.down;
+            M.principal=H.price-M.downPayment;
+            
+            if A.adjustable
+                [schP schC]=M.makeAdjustableSchedule(time,A.ratePremium+A.W.fedInterest,A.teaser,M.principal);
+                M.rate=A.ratePremium;
+            else
+                [schP schC]=M.makeFixedSchedule(time,A.ratePremium+A.W.fedInterest,M.principal);
+                M.rate=A.ratePremium+A.W.fedInterest;
+            end
+            
+            M.startPeriod=A.W.t;
             M.adjustable=A.adjustable;
-            M.type=A.type;
             M.scheduleP=schP;
             M.scheduleC=schC;
             M.H=H;
             M.MT=A;
             M.B=A.B;
-            M.downPayment=A.H.price*A.down;
+            M.W=A.W;
             
         end
+        
         
         
         

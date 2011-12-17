@@ -24,14 +24,14 @@ classdef House < DataBaseItem
        
         function value=get.value(A) % Estimated Value
                        
-            value=A.worth*A.W.houseIndex;
-            
-        end
-        
-        function price=get.price(A)
-            
-            price=A.worth*A.W.houseIndex; % TODO: this is too simple, need to factor in selling desperation
-            
+            if isempty(A.W), value=[]; return; end
+%             value=A.worth*A.W.houseIndex;
+
+% 
+%             tail=min(ceil(A.W.priceMem*3),length(A.W.houseIndexHistory));
+%             w=exp((-tail+1:0)/A.W.priceMem);
+%             value=sum(w.*A.W.houseIndexHistory(end-tail+1:end))/sum(w);
+             value=A.worth*mean(A.W.houseIndexHistory(end-A.W.priceMem:end));
         end
         
     end

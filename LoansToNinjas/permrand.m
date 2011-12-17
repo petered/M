@@ -9,6 +9,8 @@ if nargin<2
     k=length(n);
 end
 
+assert(k<=length(n),sprintf('You''ve requested %g shuffled elements from a %g-element vector!',k,length(n)));
+
 if length(n)>1 || k==1
     v=n(randperm(length(n)));
 else

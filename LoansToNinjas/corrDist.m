@@ -7,7 +7,7 @@ function [y2]=corrDist(x,y,c)
 
 assert(length(x)==length(y),'x and y must be equal length');
 
-% xp=x;
+xp=x; yp=y;
 
 xm=mean(x); xs=std(x);
 ym=mean(y); ys=std(y);

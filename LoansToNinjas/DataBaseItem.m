@@ -26,9 +26,28 @@ classdef DataBaseItem<handle
         initer;     % Boolean: indicates whether object is an initialization
                     % object.
                     
+        copies=struct; % Links to next copies.
+                    
     end
     
     methods
+        
+        
+%         function delete(A)
+%            
+%             p=properties(A);
+%             for i=1:length(p)
+%                 if ~isobject(A.(p{i}))||isempty(A.(p{i})), continue; end
+%                 pi=properties(A.(p{i}));
+%                 for j=1:length(pi)
+%                     if ~isempty(A.(p{i}).(pi{j}))
+%                         [A.(p{i}).(pi{j})]=deal([]);
+%                     end
+%                 end
+%             end
+%             
+%         end
+        
         
         function remove(A)
             
@@ -46,23 +65,21 @@ classdef DataBaseItem<handle
             % loops
             %
             % Peter O'Connor
-
+            
             if ~exist('Ob','var'), Ob=A; end
             
             % If object's already been copied
             if ~exist('copyCode','var'), 
-                Ob.copyCode=now; 
-            elseif ismember('DataBaseItem',superclasses(Ob)) && A.copyCode==copyCode,
-                B=Ob;
-                return; 
+                copyCode=['c' num2str(typecast(rand,'uint64'))]; 
+                
+            elseif isa(Ob,'DataBaseItem')
+                if isfield(Ob.copies,copyCode),   % If it's been copied already, return the copy
+                    B=Ob.copies.(copyCode);
+                    return; 
+                end
             end
             
-            
-        %     oldstate=A.enableDependency;
-        %     A.enableDependency=false;
-
             meta=metaclass(Ob);
-
             pnames=cellfun(@(x)x.Name,meta.Properties,'uniformoutput',false);
 
             B=eval(class(Ob));
@@ -70,9 +87,14 @@ classdef DataBaseItem<handle
             S=struct(Ob);
             warning on MATLAB:structOnObject
             pB=fields(S);
-        %             pB=properties(Ob);
+            
+            Ob.copies.(copyCode)=B;
+            B.copyCode=copyCode;
+            
             for i=1:length(pB)
 
+                if any(ismember(pB{i},{'copies','copyCode'})), continue; end
+                
                 whichone=strcmp(pB{i},pnames);
 
                 % Do not copy Transient or Dependent Properties
@@ -83,7 +105,8 @@ classdef DataBaseItem<handle
                 val=S.(pB{i});
 
                 if ~isempty(val) && isa(val,'handle')
-                    B.(pB{i})=eval([class(val) '.empty']); % God damn ugly matlab
+                    B.(pB{i})=eval(class(val));
+                    B.(pB{i})(length(val))=eval(class(val)); % God damn ugly matlab
                     for j=1:length(val)
                         B.(pB{i})(j)=A.copy(val(j),copyCode);
                     end
@@ -91,12 +114,8 @@ classdef DataBaseItem<handle
                     B.(pB{i})=val;
                 end      
             end
-
-            if ismember('DataBaseItem',superclasses(Ob))
-                B.copyCode=copyCode;
-            end
-
-        %     A.enableDependency=oldstate;       
+            
+            
 
         end
 
@@ -141,22 +160,31 @@ classdef DataBaseItem<handle
             ism=ismember(fld,properties(A));
             assert(all(ism),sprintf('"%s" is not a property of class "%s"',fld{find(ism,1)},cl));
             for i=1:length(fld)
-               
-                if isa(S.(fld{i}),'function_handle')
-                    temp=S.(fld)(N);
-                end
                 
-                if isnumeric(S.(fld{i}))
-                    temp=num2cell(S.(fld{i}));
-                end
+                val=S.(fld{i});
                 
-                if ~isempty(temp)
-                    [B.(fld{i})]=temp{:};
-                end
+                B.distribute(fld{i},val);
+                
+%                 if isa(val,'function_handle')
+%                     temp=S.(fld{i})(N);
+%                     temp=num2cell(temp);
+%                 elseif isnumeric(val) || islogical(val)
+%                     if isscalar(val),
+%                         temp=repmat({val},[1 N]);
+%                     else
+%                         temp=num2cell(S.(fld{i}));
+%                     end
+%                 elseif iscell(val)
+%                     temp=repmat(val,[1 N]);
+%                 end
+%                 
+%                 if ~isempty(temp)
+%                     [B.(fld{i})]=temp{:};
+%                 end
             end            
         end
         
-        function correlate(A,prop1,vec,c)
+        function correlate(A,prop1,vec,c,skewed)
             % Induce a correlation between two properties of an inialization
             % object, by changing prop2 such that it's still pulled from
             % the same distribution, but is now correlated with prop1.
@@ -176,9 +204,9 @@ classdef DataBaseItem<handle
             
 %             if ~exist('A2','var'), A2=A; end
             
-            redrawn=corrDist([A.(prop1)],vec,c);
+            redrawn=corrLink([A.(prop1)],vec,c,skewed);
 
-            if A.initer % If it's an initialization object
+            if length(A)==1 && A.initer % If it's an initialization object
                 A.(prop1)=redrawn;
             else        % If it's a fully matured object array
                 redrawn=num2cell(redrawn);
@@ -209,30 +237,39 @@ classdef DataBaseItem<handle
             if ~exist('propB','var'), propB=[]; end
             
             if ~shuffle,
-                assert(length(A)==length(B));
+                assert(any(length(A)==[1 length(B)]),'Seems you''re trying to link %g %ss to %g %ss.  If you''re indending to do it randomly, you''ll need to specify shuffle=true',length(A),class(A),length(B),class(B));
                 Asub=A;
                 Bsub=B;
             else
                 % Randomize A, select subset to link
-                count=ceil(f*length(B));
-                Asub=randperm(A,count);
+                count=ceil(f*length(A));
+                Asub=permrand(A,count);
 
                 % Get subset of B to link
                 if repeatsAllowed
                     ix=ceil(length(B)*rand(1,count));   
-                    Bsub=Asub(ix);
+                    Bsub=B(ix);
                 else
-                    assert(length(Asub)>=length(B),'The total number of unique objects requested from B exceeds the available number of objects in B');
+                    assert(count<=length(B),sprintf('You''ve requested %g unique "%s" objects, but only %g are available',count,class(B),length(B)));
                     Bsub=permrand(B,count);
                 end
             end
             
             % Make links
-            Bs=num2cell(Bsub);
-            [Asub.(propA)]=Bs{:};
-            if ~isempty(propB)
-                As=num2cell(Asub);
-                [Bsub.propB]=As{:};
+            if length(A)==1;
+                Asub.(propA)=[Asub.(propA) Bsub];
+                if ~isempty(propB)
+                    for i=1:length(Bsub)
+                        Bsub(i).(propB)=[Bsub(i).(propB) Asub];
+                    end
+                end
+            else
+                Bs=num2cell(Bsub);
+                [Asub.(propA)]=Bs{:};
+                if ~isempty(propB)
+                    As=num2cell(Asub);
+                    [Bsub.(propB)]=As{:};
+                end
             end
             
         end
@@ -243,15 +280,39 @@ classdef DataBaseItem<handle
             
         end
         
+        function distribute(A,prop,varargin)
+            % A is an array of objects
+            % prop is a property name
+            % val is a scalar, vector, or function handle returning a
+            %   distrubution of values to be distributed to A.prop
+            
+            if ischar(prop),prop={prop}; end
+            
+            assert(length(prop)==length(varargin),'You listed %g properties to fill, but provided %g arguments to fill them with',length(prop),length(varargin));
+            
+            for i=1:length(prop)
+                val=varargin{i};
+                if isa(val,'function_handle')
+                    temp=val(N);
+                    temp=num2cell(temp);
+                elseif iscell(val)
+                    temp=repmat(val,[1 length(A)]);
+                elseif isscalar(val),
+                    temp=repmat({val},[1 length(A)]);
+                else
+                    temp=num2cell(val);
+                end
+
+                assert(length(A)==length(temp),'It seems you''re tring to fill a %g-element "%s" array with %g values',length(A),class(A),length(temp));
+                if ~isempty(temp)
+                    [A.(prop{i})]=temp{:};
+                end
+            end
+            
+        end
+        
     end
     
-    
-    methods (Static)
-        
-        
-        
-        
-    end
     
     
     

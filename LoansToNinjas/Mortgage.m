@@ -2,9 +2,7 @@ classdef Mortgage < DataBaseItem
 % This class serves both to define a mortgage, and a class of mortgages.  
     
     properties
-        
-        id;             % ID indexing mortgage
-        
+                
 %         active=true;    % Whether the mortgage is active.
         
         % Properties of mortgage type
@@ -19,12 +17,6 @@ classdef Mortgage < DataBaseItem
         teaser;         % Special interest rate (just for adjustables) 
                         % offered in initial years of mortgage.  
         
-        B;              % Bank
-        
-        MT;             % Mortgage Type
-        
-        % Properties of specific mortgage
-        
         downPayment;    % Initial downpayment on mortgage
         
         principal;      % Amount outstanding on loan
@@ -38,21 +30,41 @@ classdef Mortgage < DataBaseItem
                         % For adjustable rate mortgages, this is only an
                         % estimate after the length of "teaser".
                         
-                        
-        period=1;       % Period (month) of mortgage term
-                        
-
-                        
-        H;              % House
-                
+        startPeriod;
         
+        
+        % Dependent
+        period;         % Period (month) of mortgage term
+                        
+        duration;       % Duration of mortgage
+                        
+        % Links
+        H;              % House
+              
         O;              % Owner (linked through house)
         
         W;              % The world.
         
+        B;              % Bank (linked through Mortgage type)
+        
+        MT;             % Mortgage Type
+        
+        
     end
     
     methods
+        
+        function duration=get.duration(A)
+            duration=length(A.scheduleP);
+        end
+        
+        function period=get.period(A)
+            period=A.W.t-A.startPeriod+1;
+        end
+        
+        function B=get.B(A)
+            B=A.MT.B;
+        end
         
         function remove(A)
            
@@ -64,33 +76,106 @@ classdef Mortgage < DataBaseItem
         function r=LTV(A)
             % Loan-to-value ratio.
 
-            r=A.principal./A.H.estValue;
+            r=A.principal./A.H.value;
             
         end
         
         function O=get.O(A)
             
-            O=A.H.O;
+            O=A.H.Owner;
             
         end
         
+        function yep=meetsCriteria(A,O)
+            % See if a homeowner meets the mortgage criteria
+            yep= O.cash > A.downPayment && O.salary > A.MT.incomeBuffer*A.scheduleC(1);
+            
+        end
         
         function payment=payment(A)
             % Payment for this month
             
             if A.adjustable
-                interest=(A.W.fedInterest+A.rate)*A.principal+A.schedule(A.period);
+                if A.period<=length(A.teaser), ir=A.teaser(A.period);
+                else ir=A.W.fedInterest+A.rate;
+                end
             else
-                interest=A.rate*A.principal;                
+                ir=A.rate;
             end
+            interest=ir*A.principal;    
             
-            payment=interest+A.schedule(A.period);
+            payment=interest+A.scheduleP(A.period);
             
         end
         
-        
+        function [c p]=predictedPayments(A,nsteps)
+            % Predicted payments for nsteps in the future, INCLUDING this
+            % one
+            %
+            % p is the principal remaining after nsteps
+            %
+            % If adjustable, the prediction uses present interest rates.
+            
+            remaining=length(A.scheduleP)-A.period+1; % Remaining time in mortgage
+%             mend=min(length(A.scheduleP),nsteps+A.period-1);
+            
+            endChunk=zeros(1,nsteps-remaining);
+            
+            if A.adjustable
+                
+                
+                
+                remainingTeaser=length(A.teaser)-A.period;
+                teaserChunk=A.teaser(A.period:min(end,A.period+nsteps));
+                
+                currRate=A.W.fedInterest+A.rate;
+                normalChunk=repmat(currRate,[1 min(remaining-length(teaserChunk),nsteps)]);
+                
+                ir=[teaserChunk normalChunk];
+                
+%                 ir=[A.teaser(end-remainingTeaser:min(end,A.period+nsteps)) repmat(currRate,[1 mend-A.period-max(remainingTeaser,0)])];
+                
+%                 pri=A.scheduleP(end-remaining:end);
+%                 pri=A.scheduleP(A.period:mend);
+                              
+            else
+                
+                ir=repmat(A.rate,[1 min(remaining,nsteps)]);
+                
+                
+                
+%                 ir=repmat(A.rate,[1 mend-A.period+1]);
+                
+%                 ir=
+%                 c=[A.scheduleC(A.period+1:end) endportion];
+            end
+            
+            pri=A.scheduleP(A.period:min(end,A.period+nsteps-1));
+            
+            int=(A.principal-pri).*ir;
+            c=[pri+int endChunk];
+            
+            if nargout>1
+                p=A.principal-sum(pri);
+            end
+            
+        end
 
-        
+        function makePayment(A)
+            % Make the montly mortgage payment
+            payment=A.payment;
+            
+            A.O.x(-payment);
+            A.B.x(payment);
+            
+            A.principal=A.principal-payment;
+            
+            if A.period==A.duration
+                assert(A.principal<.01,'Something''s wrong: The mortgage has supposedly run its course but there''s still %g left on the principal');
+                A.remove;                
+            end
+            
+        end
         
     end 
     
